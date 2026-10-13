@@ -1,0 +1,169 @@
+{% from "_icons.html" import icon %}
+{% macro toggle(title, desc, on=False) %}
+<label class="row">
+  <span><b>{{ title }}</b><small>{{ desc }}</small></span>
+  <input type="checkbox" class="switch" {{ 'checked' if on }}>
+</label>
+{% endmacro %}
+{% set nav = [
+  ('/', 'home', 'Главная', 'home'),
+  ('/search', 'search', 'Поиск', 'search'),
+  ('/favorites', 'favorites', 'Избранное', 'heart'),
+  ('/playlists', 'playlists', 'Плейлисты', 'list'),
+  ('/history', 'history', 'История', 'clock')] %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Asuma{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+<div class="glow g1"></div><div class="glow g2"></div>
+
+<div class="app">
+  <nav class="panel rail" aria-label="Навигация">
+    <div class="rail-top">
+      <a class="logo" href="/" aria-label="Asuma">{{ icon('note', 22) }}</a>
+      <div class="rail-nav">
+        {% for href, key, label, ic in nav %}
+        <a class="rail-btn {{ 'active' if active == key }}" href="{{ href }}" title="{{ label }}" aria-label="{{ label }}">{{ icon(ic) }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="rail-bottom">
+      <button class="rail-btn" data-open="settings" title="Настройки" aria-label="Настройки">{{ icon('settings') }}</button>
+      <div class="acc">
+        <button class="avatar" data-toggle="acc-menu" aria-label="Аккаунт">{{ icon('user', 18) }}</button>
+        <div class="menu" id="acc-menu" hidden>
+          <div class="menu-head"><b>Гость</b><small>Войдите, чтобы сохранять плейлисты и историю.</small></div>
+          <a href="/login">Войти</a>
+          <a href="/register">Регистрация</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="panel main">
+    <header class="top">
+      <h1>{% block heading %}{% endblock %}</h1>
+      <form class="searchbox" action="/search" role="search">
+        {{ icon('search', 18) }}
+        <input type="search" name="q" placeholder="Трек, исполнитель или альбом" aria-label="Поиск">
+      </form>
+    </header>
+    <div class="content">{% block content %}{% endblock %}</div>
+  </main>
+
+  <aside class="panel side">
+    {% block side %}
+    <h2>Чарт</h2>
+    <p class="muted">Самые прослушиваемые треки</p>
+    <ol class="chart">
+      {% for t in tracks|sort(attribute='plays', reverse=true) %}{% if loop.index <= 6 %}
+      <li>
+        <span class="rank">{{ loop.index }}</span>
+        <div class="cover sm" style="--h:{{ t.hue }}"></div>
+        <div class="t-main"><b>{{ t.title }}</b><span>{{ t.artist }}</span></div>
+        <span class="plays">{{ '{:,}'.format(t.plays).replace(',', ' ') }}</span>
+      </li>
+      {% endif %}{% endfor %}
+    </ol>
+    <div class="note">
+      <b>Слушайте без регистрации</b>
+      <p>Аккаунт нужен для избранного, плейлистов и истории.</p>
+      <a class="btn" href="/register">Создать аккаунт</a>
+    </div>
+    {% endblock %}
+  </aside>
+
+  <footer class="panel player">
+    <div class="now">
+      <div class="cover" style="--h:{{ tracks[0].hue }}"></div>
+      <div class="t-main"><b>{{ tracks[0].title }}</b><span>{{ tracks[0].artist }}</span></div>
+      <button class="icon-btn" aria-label="В избранное">{{ icon('heart', 18) }}</button>
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-btns">
+        <button class="icon-btn" aria-label="Перемешать">{{ icon('shuffle', 18) }}</button>
+        <button class="icon-btn" aria-label="Предыдущий">{{ icon('prev', 18) }}</button>
+        <button class="play-main" id="play-main" aria-label="Играть">
+          <span class="i-play">{{ icon('play', 20) }}</span><span class="i-pause" hidden>{{ icon('pause', 20) }}</span>
+        </button>
+        <button class="icon-btn" aria-label="Следующий">{{ icon('next', 18) }}</button>
+        <button class="icon-btn" aria-label="Повтор">{{ icon('repeat', 18) }}</button>
+      </div>
+      <div class="seek"><span>1:08</span><input type="range" min="0" max="100" value="32" aria-label="Перемотка"><span>{{ tracks[0].duration }}</span></div>
+    </div>
+    <div class="vol">{{ icon('volume', 18) }}<input type="range" min="0" max="100" value="70" aria-label="Громкость"></div>
+  </footer>
+</div>
+
+<!-- Настройки -->
+<div class="modal" id="settings" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="st-title">
+    <header>
+      <h2 id="st-title">Настройки</h2>
+      <button class="icon-btn" data-close aria-label="Закрыть">{{ icon('close', 18) }}</button>
+    </header>
+    <div class="dlg-body">
+      <nav class="tabs">
+        <p>Интерфейс</p>
+        <button class="tab active" data-tab="look">Внешний вид</button>
+        <button class="tab" data-tab="play">Воспроизведение</button>
+        <p>Аккаунт</p>
+        <button class="tab" data-tab="profile">Профиль</button>
+        <button class="tab" data-tab="privacy">Приватность</button>
+        <div class="ver">Asuma 1.0.0 · веб-версия</div>
+      </nav>
+      <div class="panes">
+        <section class="pane" data-pane="look">
+          {{ toggle('Прозрачные панели', 'Панели просвечивают фон со стеклянным эффектом.', True) }}
+          {{ toggle('Размытие фона', 'Размывать всё, что находится за панелями.', True) }}
+          {{ toggle('Компактный список треков', 'Уменьшить высоту строк в списках.') }}
+          <div class="row">
+            <span><b>Акцентный цвет</b><small>Цвет кнопок и активных пунктов меню.</small></span>
+            <div class="swatches">
+              {% for c in ['#3ddc97', '#6ea8ff', '#ff7a9c', '#ffb454'] %}
+              <button type="button" class="swatch {{ 'on' if loop.first }}" style="--c:{{ c }}" data-accent="{{ c }}" aria-label="Цвет {{ c }}"></button>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+        <section class="pane" data-pane="play" hidden>
+          {{ toggle('Автовоспроизведение', 'После трека включать следующий из списка.', True) }}
+          {{ toggle('Плавный переход', 'Затухание и нарастание звука между треками.') }}
+          {{ toggle('Выравнивание громкости', 'Одинаковая громкость для разных треков.', True) }}
+          <label class="row">
+            <span><b>Качество потока</b><small>Экономия трафика или лучший звук.</small></span>
+            <select class="field"><option>Авто</option><option>Высокое</option><option>Экономное</option></select>
+          </label>
+        </section>
+        <section class="pane" data-pane="profile" hidden>
+          <label class="row">
+            <span><b>Имя пользователя</b><small>Так вас видят другие слушатели.</small></span>
+            <input class="field" type="text" placeholder="Гость" disabled>
+          </label>
+          <label class="row">
+            <span><b>Электронная почта</b><small>Нужна для входа и восстановления пароля.</small></span>
+            <input class="field" type="email" placeholder="you@example.com" disabled>
+          </label>
+          <div class="row"><span><small>Войдите в аккаунт, чтобы изменить профиль.</small></span><a class="btn" href="/login">Войти</a></div>
+        </section>
+        <section class="pane" data-pane="privacy" hidden>
+          {{ toggle('Сохранять историю прослушиваний', 'История доступна только вам.', True) }}
+          {{ toggle('Учитывать мои прослушивания в чарте', 'Ваша активность влияет на рейтинг треков.', True) }}
+          {{ toggle('Показывать плейлисты другим', 'Публичные плейлисты можно открыть по ссылке.') }}
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', path='app.js') }}"></script>
+</body>
+</html>

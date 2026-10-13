@@ -1,0 +1,24 @@
+{% from "_icons.html" import icon %}
+
+{% macro tracklist(items) %}
+<div class="tracks">
+  {% for t in items %}
+  <div class="track">
+    <button class="t-play" aria-label="Играть">{{ icon('play', 16) }}</button>
+    <div class="cover" style="--h:{{ t.hue }}"></div>
+    <div class="t-main"><b>{{ t.title }}</b><span>{{ t.artist }}</span></div>
+    <span class="t-album">{{ t.album }}</span>
+    <button class="icon-btn" aria-label="В избранное">{{ icon('heart', 18) }}</button>
+    <span class="t-time">{{ t.duration }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro empty(title, text, href="", label="") %}
+<div class="empty">
+  <h3>{{ title }}</h3>
+  <p>{{ text }}</p>
+  {% if href %}<a class="btn" href="{{ href }}">{{ label }}</a>{% endif %}
+</div>
+{% endmacro %}

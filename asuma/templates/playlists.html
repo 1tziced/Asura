@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Asuma — Плейлисты{% endblock %}
+{% block heading %}Плейлисты{% endblock %}
+{% block content %}
+<div class="cards">
+  <button class="card new" type="button">{{ icon('plus', 28) }}<b>Новый плейлист</b></button>
+  {% for name, h in [('Для дороги', 200), ('Фокус', 150), ('Вечер', 300)] %}
+  <a class="card" href="#">
+    <div class="cover big" style="--h:{{ h }}"></div>
+    <b>{{ name }}</b><span>Пример · 12 треков</span>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% from "_tracks.html" import empty %}
+{% block title %}Asuma — Избранное{% endblock %}
+{% block heading %}Избранное{% endblock %}
+{% block content %}
+{{ empty('Войдите, чтобы сохранять треки', 'Нажмите на сердечко у трека, и он появится здесь.', '/login', 'Войти') }}
+{% endblock %}

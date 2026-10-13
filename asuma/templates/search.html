@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_tracks.html" import tracklist %}
+{% block title %}Asuma — Поиск{% endblock %}
+{% block heading %}Поиск{% endblock %}
+{% block content %}
+<div class="chips" role="group" aria-label="Искать по">
+  <button class="chip on">Везде</button><button class="chip">Название</button>
+  <button class="chip">Исполнитель</button><button class="chip">Альбом</button>
+</div>
+<section>
+  <h2>Результаты</h2>
+  {{ tracklist(tracks[:5]) }}
+</section>
+{% endblock %}

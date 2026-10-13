@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Asuma — {{ 'Вход' if mode == 'login' else 'Регистрация' }}{% endblock %}
+{% block bodyclass %}no-side{% endblock %}
+{% block heading %}{{ 'Вход' if mode == 'login' else 'Регистрация' }}{% endblock %}
+{% block side %}{% endblock %}
+{% block content %}
+<form class="auth" onsubmit="return false">
+  {% if mode == 'register' %}
+  <label>Имя пользователя<input class="field" type="text" autocomplete="username"></label>
+  {% endif %}
+  <label>Электронная почта<input class="field" type="email" autocomplete="email"></label>
+  <label>Пароль<input class="field" type="password" autocomplete="current-password"></label>
+  <button class="btn solid" type="submit">{{ 'Войти' if mode == 'login' else 'Создать аккаунт' }}</button>
+  {% if mode == 'login' %}
+  <p class="muted"><a href="#">Забыли пароль?</a> · <a href="/register">Регистрация</a></p>
+  {% else %}
+  <p class="muted">Уже есть аккаунт? <a href="/login">Войти</a></p>
+  {% endif %}
+</form>
+{% endblock %}

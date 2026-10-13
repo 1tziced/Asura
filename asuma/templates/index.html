@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_tracks.html" import tracklist %}
+{% block title %}Asuma — Главная{% endblock %}
+{% block heading %}Главная{% endblock %}
+{% block content %}
+<section>
+  <h2>Новое в библиотеке</h2>
+  <div class="cards">
+    {% for t in tracks[:5] %}
+    <a class="card" href="#">
+      <div class="cover big" style="--h:{{ t.hue }}"></div>
+      <b>{{ t.title }}</b><span>{{ t.artist }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+<section>
+  <h2>Все треки</h2>
+  {{ tracklist(tracks) }}
+</section>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% from "_tracks.html" import empty %}
+{% block title %}Asuma — История{% endblock %}
+{% block heading %}История{% endblock %}
+{% block content %}
+{{ empty('История пока недоступна', 'Войдите в аккаунт, и мы покажем, что вы слушали.', '/login', 'Войти') }}
+{% endblock %}
